@@ -1,0 +1,113 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="jangwoo">
+    <meta name="description" content="DB기말 과제입니다.">
+    <title>화랑 영화관</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}?after">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?after">
+
+    <!-- 파비콘 -->
+    <link rel="shortcut icon" href="{% static 'img/theater_icon.ico' %}">
+
+    <!-- 웹 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- HTLM5shiv ie6~8 -->
+    <!--[if lt IE 9]>
+        <script src="{%static "js/html5shiv.min.js" %}"></script>
+        <script type="text/javascript">
+            alert("현재 브라우저는 지원하지 않습니다. 그롬 브라우저를 추천합니다.!");
+        </script>
+    <![endif]-->
+</head>
+<body>
+    <header id="header">
+        <div class="container">
+            <div class="row">
+                <div class="header clearfix">
+                    <h1>
+                        <a href="{% url "home" %}">
+                            <em><img src="{% static 'img/logo.png' %}" alt="화랑"></em>
+                            <em><img src="{% static 'img/logo-sub.png' %}" alt="blank"></em>
+                        </a>
+                    </h1>
+                    <nav class="nav">
+                        <ul class="clearfix">
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'search' %}">영화 검색</a></li>
+                            <li><a href={% url 'schedule' %}>상영시간표</a></li>
+                            {% if user.is_authenticated %}
+                                <li><a href={% url 'logout' %}>로그아웃</a></li>
+                                <li class="dropdown"><a href="{% url 'account' %}">{{ user.회원이름 }}님.</a>
+                                    <div class="dropdown-content">
+                                        <a href="{% url 'account' %}">회원정보</a>
+                                        <a href="{% url 'ticketing_view' %}">예매정보</a>
+                                        <a href="{% url 'delete' %}">회원탈퇴</a>
+                                    </div>
+                                </li>
+                            {% else %}
+                                <li><a href="{% url 'signup' %}">회원가입</a></li>
+                                <li><a href="{% url 'login' %}">로그인</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- //header -->
+    <!-- //영화목록 -->
+    <div>
+        <form method="POST" action="{% url 'search' %}">
+            {% csrf_token %}
+            <p style="margin-top: 0; display: inline-block">종류</p>
+            <select name='select' class="form-select" aria-label="Default select example"
+                    style="display: inline-block">
+                <option value="영화제목">영화제목</option>
+                <option value="영화감독">영화감독</option>
+                <option value="주연배우">주연배우</option>
+                <option value="평점(이상)">평점(이상)</option>
+                <option value="평점(이하)">평점(이하)</option>
+            </select>
+            <p style="margin-top: 0; display: inline-block">검색내용</p>
+            <input type="text" name="content" style="display: inline-block; width: 20%">
+            <input type="submit" name="board" value="검색" style="display: inline-block">
+        </form>
+    </div>
+    <div class="movie_all">
+        <div class="titlelabel">
+            <img src="{% static 'img/검색결과.PNG' %}" alt="현재상영작">
+        </div>
+        <div class="movies">
+            {% for movie in movies %}
+                <div class="movie">
+                    <img src="{{ movie.포스터.url }}" alt={{ movie.영화번호 }} class="movie__img"/>
+                    <div>
+                        <h1 style="font-size: xx-large" class="movie__title"><strong>{{ movie.영화제목 }}</strong></h1>
+                        <p>영화감독 : {{ movie.영화감독 }}</p>
+                        <p>주연배우 : {{ movie.주연배우 }}</p>
+                        <p>평점 : {{ movie.평점 }}점</p>
+                        <form method="POST" action="{% url 'board' %}">
+                            {% csrf_token %}
+                            <input type="text" hidden name="영화번호" value="{{ movie.영화번호 }}">
+                            <input type="submit" name="board" value="게시판">
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- //영화목록 -->
+
+
+
+</body>
+</html>

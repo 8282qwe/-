@@ -1,0 +1,97 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="jangwoo">
+    <meta name="description" content="DB기말 과제입니다.">
+    <title>화랑 영화관</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}?after">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?after">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}?after">
+
+    <!-- 파비콘 -->
+    <link rel="shortcut icon" href="{% static 'img/theater_icon.ico' %}">
+
+    <!-- 웹 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- HTLM5shiv ie6~8 -->
+    <!--[if lt IE 9]>
+        <script src="{%static "js/html5shiv.min.js" %}"></script>
+        <script type="text/javascript">
+            alert("현재 브라우저는 지원하지 않습니다. 그롬 브라우저를 추천합니다.!");
+        </script>
+    <![endif]-->
+</head>
+<body>
+    <header id="header">
+        <div class="container">
+            <div class="row">
+                <div class="header clearfix">
+                    <h1>
+                        <a href="{% url "home" %}">
+                            <em><img src="{% static 'img/logo.png' %}" alt="화랑"></em>
+                            <em><img src="{% static 'img/logo-sub.png' %}" alt="blank"></em>
+                        </a>
+                    </h1>
+                    <nav class="nav">
+                        <ul class="clearfix">
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href={% url 'schedule' %}>상영시간표</a></li>
+                            <li><a href="{% url 'search' %}">영화 검색</a></li>
+                            {% if user.is_authenticated %}
+                                <li><a href={% url 'logout' %}>로그아웃</a></li>
+                                <li class="dropdown"><a href="{% url 'account' %}">{{ user.회원이름 }}님.</a>
+                                    <div class="dropdown-content">
+                                        <a href="{% url 'account' %}">회원정보</a>
+                                        <a href="{% url 'ticketing_view' %}">예매정보</a>
+                                        <a href="{% url 'delete' %}">회원탈퇴</a>
+                                    </div>
+                                </li>
+                            {% else %}
+                                <li><a href="{% url 'signup' %}">회원가입</a></li>
+                                <li><a href="{% url 'login' %}">로그인</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- //header -->
+    <!-- //로그인 폼 -->
+            <div class="formBody">
+                <div class="wrap">
+                    <div class="login">
+                        <form method="POST" action="{% url 'login' %}">
+                            {% csrf_token %}
+                            <h2>로그인</h2>
+                            <div class="login_id">
+                                <h4>ID</h4>
+                                <input type="text" name="username" id="" placeholder="ID"/>
+                            </div>
+                            <div class="login_pw">
+                                <h4>Password</h4>
+                                <input type="password" name="password" id="" placeholder="Password"/>
+                            </div>
+                            <span style="color: red"><strong>{{ error }}</strong></span>
+                            <div class="submit">
+                                <input type="submit" name='check' value="로그인"/>
+                                <input type="submit" name='check' value="회원가입"/>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    <!-- //로그인 폼 -->
+
+
+
+</body>
+</html>

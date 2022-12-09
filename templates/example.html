@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+@media screen and (max-width: 980px) {
+  .ultimate-container {
+    width: 500px;
+  }
+  .visual-section {
+    display: none;
+  }
+}
+function setMovieData(movieIndex, moviePrice) {
+  localStorage.setItem('selectedMovieIndex', movieIndex)
+  localStorage.setItem('selectedMoviePrice', moviePrice)
+}
+
+function updateSelectedCount() {
+  const selectedSeats = document.querySelectorAll('.row .seat.selected')
+  const selectedSeatsCount = selectedSeats.length
+  const seatsIndex = [...selectedSeats].map((seat) => [...seats].indexOf(seat))
+
+  localStorage.setItem('selectedSeats', JSON.stringify(seatsIndex))
+}
+
+movieSelect.addEventListener('change', (e) => {
+  ticketPrice = +e.target.value
+  setMovieData(e.target.selectedIndex, e.target.value)
+  updateSelectedCount()
+})
+</body>
+</html>

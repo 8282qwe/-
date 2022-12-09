@@ -1,0 +1,145 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="jangwoo">
+    <meta name="description" content="DB기말 과제입니다.">
+    <title>화랑 영화관</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}?after">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?after">
+    <link rel="stylesheet" href="{% static 'css/ticketing_search.css' %}?after">
+
+    <!-- 파비콘 -->
+    <link rel="shortcut icon" href="{% static 'img/theater_icon.ico' %}">
+
+    <!-- 웹 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- HTLM5shiv ie6~8 -->
+    <!--[if lt IE 9]>
+        <script src="{%static "js/html5shiv.min.js" %}"></script>
+        <script type="text/javascript">
+            alert("현재 브라우저는 지원하지 않습니다. 그롬 브라우저를 추천합니다.!");
+        </script>
+    <![endif]-->
+</head>
+<body>
+<header id="header">
+        <div class="container">
+            <div class="row">
+                <div class="header clearfix">
+                    <h1>
+                        <a href="{% url "home" %}">
+                            <em><img src="{% static 'img/logo.png' %}" alt="화랑"></em>
+                            <em><img src="{% static 'img/logo-sub.png' %}" alt="blank"></em>
+                        </a>
+                    </h1>
+                    <nav class="nav">
+                        <ul class="clearfix">
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'search' %}">영화 검색</a></li>
+                            <li><a href={% url 'schedule' %}>상영시간표</a></li>
+                            {% if user.is_authenticated %}
+                                <li><a href={% url 'logout' %}>로그아웃</a></li>
+                                <li class="dropdown"><a href="{% url 'account' %}">{{ user.회원이름 }}님.</a>
+                                    <div class="dropdown-content">
+                                        <a href="{% url 'account' %}">회원정보</a>
+                                        <a href="{% url 'ticketing_view' %}">예매정보</a>
+                                        <a href="{% url 'delete' %}">회원탈퇴</a>
+                                    </div>
+                                </li>
+                            {% else %}
+                                <li><a href="{% url 'signup' %}">회원가입</a></li>
+                                <li><a href="{% url 'login' %}">로그인</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+<!-- //header -->
+    <!-- //영화목록 -->
+    <div class="movie_all">
+        <div class="titlelabel">
+            <img src="{% static 'img/예매내역.PNG' %}" alt="현재상영작">
+        </div>
+        <div class="movies">
+            {% for ticket in ticketings %}
+                <div class="movie">
+                    <div class="seat_all">
+                        <div class="{{ ticket.id }}">
+                            <div class="screen"></div>
+                            <script>
+                                var theather = [];
+                                var seatbuffer =
+                                    "{{ ticket.상영관번호.행번호 }}".split(",");
+                                var width_1 = Number(seatbuffer[0]);
+                                var width_2 =
+                                    Number("{{ ticket.상영관번호.위치번호 }}");
+                                var height = Number(seatbuffer[1]);
+                                var ticketing =
+                                    "{{ ticket.예매좌석 }}".split(",");
+                                var width = width_1 * width_2;
+                                for (var i = 0; i < width * height; i++) {
+                                    theather.push(i);
+                                }
+                                for (var i = 0; i < ticketing.length; i++) {
+                                    theather[Number(ticketing[i])] = String(400);
+                                }
+                                var container_unique = document.getElementsByClassName('{{ ticket.id }}')[0];
+                                var index = 0;
+                                for (var i = 0; i < height; i++) {
+                                    var row = document.createElement('div');
+                                    row.setAttribute('class', 'seats_row');
+                                    for (var j = 0; j < width; j++) {
+                                        var content = document.createElement('div')
+                                        if (Number(theather[index]) === 400) {
+                                            if(width_2 === 3){
+                                                content.setAttribute('class', 'seat2 occupied');
+                                            } else {
+                                                content.setAttribute('class', 'seat occupied');
+                                            }
+                                            row.appendChild(content)
+                                            index++;
+                                        } else {
+                                            if (width_2 === 3) {
+                                                content.setAttribute('class', 'seat2');
+                                            } else {
+                                                content.setAttribute('class', 'seat');
+                                            }
+                                            row.appendChild(content)
+                                            index++;
+                                        }
+                                    }
+                                    container_unique.appendChild(row)
+                                }
+                            </script>
+                        </div>
+                    </div>
+                    <div style="margin-left: 25%">
+                        <h1 style="font-size: large" class="movie__title"><strong>{{ ticket.영화번호 }}{{ ticket.id }}</strong></h1>
+                        <p>상영관번호 : {{ ticket.상영관번호 }}관</p>
+                        <p>예매일시 : {{ ticket.예매일시 }}</p>
+                        <p>금액 : {{ ticket.금액 }}원</p>
+                        <form method="POST" action="{% url 'ticketing_view' %}">
+                            <input type="text" name="영화번호" value="{{ ticket.id }}" hidden />
+                            <input type="submit" value="예매 취소하기"/>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- //영화목록 -->
+
+
+
+</body>
+</html>

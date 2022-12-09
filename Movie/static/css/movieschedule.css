@@ -1,0 +1,10 @@
+@charset "utf-8";
+
+div h2{
+  font-size: xx-large;
+}
+
+div p {
+  margin-top: 1%;
+  font-size: medium;
+}

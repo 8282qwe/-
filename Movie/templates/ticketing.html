@@ -1,0 +1,112 @@
+{% load static %}
+{% load convert_int %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <link rel="stylesheet" id= 'css' href="{% static 'css/ticketing.css' %}" />
+    {% if theater_row == 3 %}
+        <script>
+            var ch = document.getElementById('css');
+            ch.href="{% static 'css/ticketing2.css' %}"
+        </script>
+    {% endif %}
+    <title>Movie Seat Booking</title>
+</head>
+
+<body>
+
+    <div class="movie-container">
+        <label>{{ movie_sch.id }}/{{ movie_sch.영화번호 }}/{{ movie_sch.상영시간 }}/{{ movie_sch.상영관번호 }}관</label>
+        <select id="movie" hidden>
+                <option value="{% convert_int movie_sch.요금 users %}">{{ movie_sch.id }}/{{ movie_sch.영화번호 }}/{{ movie_sch.상영시간 }}/{{ movie_sch.상영관번호 }}관</option>
+        </select>
+    </div>
+
+    <ul class="showcase">
+        <li>
+            <div class="seat"></div>
+            <small>Available</small>
+        </li>
+        <li>
+            <div class="seat selected"></div>
+            <small>Selected</small>
+        </li>
+        <li>
+            <div class="seat occupied"></div>
+            <small>Occupied</small>
+        </li>
+    </ul>
+
+    <div class="container">
+        <div class="screen"></div>
+        <script>
+            var theather = {{ theaterseat }};
+            var width = {{ theater_width }};
+            var height = {{ theater_height }};
+            var container_unique = document.getElementsByClassName('container')[0];
+            var index = 0;
+            for (var i = 0; i < height; i++) {
+                var row = document.createElement('div');
+                row.setAttribute('class', 'row');
+                for (var j = 0; j < width; j++) {
+                    var content = document.createElement('div')
+                    if (theather[index] == 400) {
+                        content.setAttribute('class', 'seat occupied');
+                        row.appendChild(content)
+                        index++;
+                    } else {
+                        content.setAttribute('class', 'seat');
+                        row.appendChild(content)
+                        index++;
+                    }
+                }
+                container_unique.appendChild(row)
+            }
+        </script>
+    </div>
+
+    <p class="text">
+        선택좌석:<span id="count">0</span>개  총가격: <span id="total">0</span>원입니다.
+    </p>
+    <a href={% url 'schedule' %}><button id="submit">결제하기</button></a>
+    <a href="{% url 'schedule' %}"><button id="back">뒤로가기</button></a>
+    <script>
+        var submit_button = document.getElementById('submit');
+        var back_button = document.getElementById('back');
+
+        back_button.addEventListener('click',() =>{
+            localStorage.clear();
+        });
+
+        submit_button.addEventListener('click', () => {
+            $.ajax({
+                url: '{% url "ticketing" %}',
+                type: 'POST',
+                data: JSON.stringify(obj = {
+                    'seat': localStorage.getItem('selectedSeats'),
+                    'movie': $("#movie option:selected").text(),
+                    'cost': document.getElementById('total').innerHTML,
+                }),
+                beforeSend: function () {
+                    console.log(localStorage.getItem('selectedSeats'));
+                },
+                success : function (){
+                    localStorage.clear();
+                },
+                error : function (){
+                    console.log(localStorage.getItem('selectedSeats'));
+                }
+            });
+        });
+    </script>
+
+    <script src="{% static 'js/ticketing.js' %}"></script>
+</body>
+
+</html>
